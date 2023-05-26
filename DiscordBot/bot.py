@@ -131,8 +131,10 @@ class ModBot(discord.Client):
                             reaction, _ = await client.wait_for("reaction_add", timeout=1000000, check=check)
                             if str(reaction.emoji) == '1️⃣':
                                 await channel.send("Moderation Team informs the reporter that the reported message did not violate any Community Guidelines.")
+                                await message.channel.send("After looking through the report, the moderation team has decided that the reported message did not violate any Community Guidelines.")
                             elif str(reaction.emoji) == '2️⃣':
                                 await channel.send("Moderation Team removes the reported message.")
+                                await message.channel.send("After looking through the report, the moderation team has decided that the reported message did violate the Community Guidelines.")
 
                         except asyncio.TimeoutError:
                             await channel.send('You did not react in time.')
