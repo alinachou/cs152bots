@@ -44,8 +44,14 @@ class Report:
         self.state = State.REPORT_START
         self.client = client
         self.message = None
+
+        # report details
         self.user = ""  # the user that is experiencing the scam / harassment / violence
+        self.report_category = ""
         self.report_content = ""
+        self.message_link = ""
+        # self.report_subcategory = ""
+        self.report_description = ""
     
     async def handle_message(self, message):
         '''
@@ -84,6 +90,8 @@ class Report:
 
             # Here we've found the message - it's up to you to decide what to do next!
             self.state = State.MESSAGE_IDENTIFIED
+            self.report_content = message.content
+            self.message_link = message.jump_url
             return ["I found this message:", "```" + message.author.name + ": " + message.content + "```", \
                     "If this is the message you'd like to report, please confirm by typing `report`, otherwise, you can cancel the report by saying `cancel`."]
         
@@ -97,18 +105,22 @@ class Report:
         if self.state == State.REPORT_CONFIRM:
             if message.content == "scam/fraud":
                 self.state = State.SCAM
+                self.report_category = "scam/fraud"
                 reply = "Please select the type of fraud you would like to report.\n"
                 reply += "``phishing``, ``impersonation``, ``cryptocurrency``, ``dating scam``, ``other``"
             elif message.content == "harassment":
                 self.state = State.HARASSMENT
+                self.report_category = "harassment"
                 reply = "Who is the harassment directed towards?\n"
                 reply += "Please select ``myself`` or ``someone I know``.`"
             elif message.content == "violence":
                 self.state = State.VIOLENCE
+                self.report_category = "violence"
                 reply = "Who is the violence directed towards?\n"
                 reply += "Please select ``myself`` or ``someone I know``."
             elif message.content == "other":
                 self.state = State.CATEGORY_OTHER
+                self.report_category = "other"
                 reply = "We are committed to upholding our community standard and your input is valuable to us. Would you like to elaborate on your report?\n"
                 reply += "Please select ``yes`` or ``no``."
             else:
@@ -125,7 +137,7 @@ class Report:
                 return ["Thank you for your report. A moderator will follow up on it."]
             elif message.content == "dating scam":
                 reply = "We define dating/ romance scams as the criminal act of feigning a romantic relationship in order to extort, manipulate, or otherwise financially benefit from another person.\n"
-                reply += "Would you like to continue with your report?"
+                reply += "Would you like to continue with your report?\n"
                 reply += "Please select [``yes`` or ``no``]."
                 self.state = State.REPORT_CONTINUE
                 return [reply]
@@ -175,7 +187,7 @@ class Report:
             elif message.content == "no":
                 self.state = State.NEXT_STEP
         if self.state == State.AWAIT_REPORT:
-            self.report_content = message.content   # store user report message
+            self.report_description = message.content   # store user report message
             self.state = State.NEXT_STEP
         if self.state == State.NEXT_STEP:
             reply = "Thank you.Your report has been submitted. Our moderators will conduct an investigation and determine whether the content violates our Community Guidelines. If this is an emergency, please contact your local authorities.\n"
@@ -212,7 +224,7 @@ class Report:
             elif message.content == "no":
                 self.state = State.NEXT_STEP_OTHER
         if self.state == State.AWAIT_REPORT_OTHER:
-            self.report_content = message.content   # store user report message
+            self.report_description = message.content   # store user report message
             self.state = State.NEXT_STEP_OTHER
         if self.state == State.NEXT_STEP_OTHER:
             self.state = State.REPORT_COMPLETE
