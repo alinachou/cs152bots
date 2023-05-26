@@ -8,6 +8,7 @@ import re
 import requests
 from report import Report
 import pdb
+import asyncio
 
 # Set up logging to the console
 logger = logging.getLogger('discord')
@@ -105,13 +106,36 @@ class ModBot(discord.Client):
                     if channel.name == f'group-{self.group_num}-mod':
                         self.mod_channels[guild.id] = channel
                         report_info = self.reports[author_id]
-                        report_details = "Report Details\n\n"
-                        report_details += f"User: {message.author.name}\n"
-                        report_details += f"Report Category: {report_info.report_category}\n"
-                        report_details += f"Message Content that the User Wish to Report: {report_info.report_content}\n"
-                        report_details += f"Message Link: {report_info.message_link}\n"
-                        report_details += f"Report Description: {report_info.report_description}\n\n"
+                        report_details = "**Report Details**\n\n"
+                        report_details += f"**User:** {message.author.name}\n"
+                        report_details += f"**Report Category:** {report_info.report_category}\n"
+                        report_details += f"**Message Content that the User Wish to Report:** ``{report_info.report_content}``\n"
+                        report_details += f"**Message Link:** {report_info.message_link}\n"
+                        report_details += f"**Report Description:** {report_info.report_description}\n\n"
                         await channel.send(report_details)
+
+                        moderator_action = "Moderators please choose from the following categories to determine the result of this report.\n"
+                        moderator_action += "1️⃣: Reported message does not violate Community Guidelines for the specified category.\n"
+                        moderator_action += "2️⃣: Reported message does violate Community Guidelines for the specified category."
+                        response_message = await channel.send(moderator_action)
+
+                        await response_message.add_reaction('1️⃣')
+                        await response_message.add_reaction('2️⃣')
+
+                        # Define a check function for the reaction
+                        def check(reaction, user):
+                            return str(reaction.emoji) in ['1️⃣', '2️⃣']
+                        
+                        try:
+                            # Wait for a reaction
+                            reaction, _ = await client.wait_for("reaction_add", timeout=1000000, check=check)
+                            if str(reaction.emoji) == '1️⃣':
+                                await channel.send("Moderation Team informs the reporter that the reported message did not violate any Community Guidelines.")
+                            elif str(reaction.emoji) == '2️⃣':
+                                await channel.send("Moderation Team removes the reported message.")
+
+                        except asyncio.TimeoutError:
+                            await channel.send('You did not react in time.')
             
             self.reports.pop(author_id)
             return [reply]

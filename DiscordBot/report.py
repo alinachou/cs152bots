@@ -191,8 +191,8 @@ class Report:
             self.state = State.NEXT_STEP
         if self.state == State.NEXT_STEP:
             reply = "Thank you.Your report has been submitted. Our moderators will conduct an investigation and determine whether the content violates our Community Guidelines. If this is an emergency, please contact your local authorities.\n"
-            reply += "Would you like to prevent any further contact by blocking this user and any future accounts they may create?\n"
-            reply += "Please select [``no``, ``this user only``, ``this user and future accounts``]"
+            # reply += "Would you like to prevent any further contact by blocking this user and any future accounts they may create?\n"
+            # reply += "Please select [``no``, ``this user only``, ``this user and future accounts``]"
             # TODO: add subsequent moderator actions after moderator flow
             self.state = State.REPORT_COMPLETE
             return [reply]
