@@ -25,7 +25,9 @@ with open(token_path) as f:
     # If you get an error here, it means your token is formatted incorrectly. Did you put it in quotes?
     tokens = json.load(f)
     discord_token = tokens['discord']
-    openai_token = tokens['openai']
+    openai_token = tokens['openai_key']
+    openai_org = tokens['openai_org']
+    perspective_token = tokens['perspective']
 
 
 class ModBot(discord.Client):
