@@ -162,8 +162,11 @@ class ModBot(discord.Client):
         TODO: Once you know how you want to evaluate messages in your channel, 
         insert your code here! This will primarily be used in Milestone 3. 
         '''
+        # api calls here:
 
-        return message
+        response = 0 # add in what we want to differentiate to this varaible
+        tup = (message, response)
+        return tup
 
     
     def code_format(self, text):
@@ -172,7 +175,12 @@ class ModBot(discord.Client):
         evaluated, insert your code here for formatting the string to be 
         shown in the mod channel. 
         '''
-        return "Evaluated: '" + text+ "'"
+
+        message, response = text
+        if response == 1:
+            return "This message was automatically flagged: '" + message+"'"
+            # maybe we even add this data to a backend, SQL database maybe?
+        return "Evaluated: '" + message + "'"
 
 
 client = ModBot()
