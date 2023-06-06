@@ -9,6 +9,8 @@ import requests
 from report import Report
 import pdb
 import asyncio
+import openai
+from openAIBot import openAIClassifier
 
 # Set up logging to the console
 logger = logging.getLogger('discord')
@@ -28,6 +30,7 @@ with open(token_path) as f:
     openai_token = tokens['openai_key']
     openai_org = tokens['openai_org']
     perspective_token = tokens['perspective']
+gpt_classifier = openAIClassifier(openai_token, openai_org)
 
 
 class ModBot(discord.Client):
@@ -165,7 +168,12 @@ class ModBot(discord.Client):
         # api calls here:
 
         response = 0 # add in what we want to differentiate to this varaible
-        tup = (message, response)
+        gpt_response = gpt_classifier.check_message(message)
+        if "Ignored" in gpt_response:
+            tup = (gpt_response, response)
+        else:
+            response = 1
+            tup = (gpt_response, response)
         return tup
 
     
@@ -178,7 +186,8 @@ class ModBot(discord.Client):
 
         message, response = text
         if response == 1:
-            return "This message was automatically flagged: '" + message+"'"
+            category = message.split(':')[1].strip()
+            return "This message was automatically flagged for " + category + "."
             # maybe we even add this data to a backend, SQL database maybe?
         return "Evaluated: '" + message + "'"
 
