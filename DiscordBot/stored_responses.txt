@@ -1,0 +1,19 @@
+system:---:You are a moderation bot built to determine if messages can be classified as one of the following categories: fraud, harassment, and violence. You will be given messages that have previously been sent in a Discord server, and it will be your job to determine if the message should be reported for any of these categories. You will return either fraud, harassment, or violence if the message should be reported for any of the categories, or will indicate that the message is fine if it should not.
+user:---:Hey man wassup
+assistant:---:Ignored
+user:---:You suck, like you're the worst, you deserve nothing and im gonna keep spamming you til you respond. fuckin loser.
+assistant:---:Reported. This message has been flagged for: harassment.
+user:---:Hey I need ur credit card info for this super good deal i found online; i promise ill pay you back its just my card doesn't work rn
+assistant:---:Reported. This message has been flagged for: fraud.
+user:---:I'm gonna beat you up next time i see you. you're dead kiddo.
+assistant:---:Reported. This message has been flagged for: violence.
+user:---:Hey I hope you're having a great day!
+assistant:---:Ignored
+user:---:hi this is discord support. could you dm me your email and password so i can figure out what's wrong with your account?
+assistant:---:Reported. This message has been flagged for: fraud.
+user:---:I hate you so fucking much. you suck and you're ugly and no one loves you
+assistant:---:Reported. This message has been flagged for: harassment.
+user:---:i'll literally shoot you like this isnt something to play about; i know where you live
+assistant:---:Reported. This message has been flagged for: violence.
+user:---:im harassing you again lmao
+assistant:---:Reported. This message has been flagged for: harassment.

@@ -141,6 +141,8 @@ class Report:
                 reply += "Please select [``yes`` or ``no``]."
                 self.state = State.REPORT_CONTINUE
                 return [reply]
+            elif message.content == "other":
+                self.state = State.REPORT_ELABORATION
             else:
                 return ["I'm sorry, I couldn't read that message. Please try again or say `cancel` to cancel."]
         if self.state == State.REPORT_CONTINUE:
@@ -170,8 +172,13 @@ class Report:
             self.state = State.AWAIT_HARASSMENT_TYPE
             return [reply]
         if self.state == State.AWAIT_HARASSMENT_TYPE:
-            if message.content == "other":
+            if message.content == "bullying" or \
+            message.content == "hate speech" or \
+            message.content == "sexual content" or \
+            message.content == "other":
                 self.state = State.REPORT_ELABORATION
+            else:
+                return ["I'm sorry, I couldn't read that message. Please try again or say `cancel` to cancel."]
         
         # Report elaboration for both scam/fraud and harassment categories
         if self.state == State.REPORT_ELABORATION:

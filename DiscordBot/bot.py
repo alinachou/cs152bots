@@ -11,6 +11,7 @@ import pdb
 import asyncio
 import openai
 from openAIBot import openAIClassifier
+from parseDatabase import DataParser
 
 # Set up logging to the console
 logger = logging.getLogger('discord')
@@ -31,7 +32,7 @@ with open(token_path) as f:
     openai_org = tokens['openai_org']
     perspective_token = tokens['perspective']
 gpt_classifier = openAIClassifier(openai_token, openai_org)
-
+dataParser = DataParser("stored_responses.txt")
 
 class ModBot(discord.Client):
     def __init__(self): 
@@ -141,6 +142,7 @@ class ModBot(discord.Client):
                             elif str(reaction.emoji) == '2️⃣':
                                 await channel.send("Moderation Team removes the reported message.")
                                 await message.channel.send("After looking through the report, the moderation team has decided that the reported message did violate the Community Guidelines.")
+                                dataParser.addEntry(report_info.report_content, report_info.report_category)
 
                         except asyncio.TimeoutError:
                             await channel.send('You did not react in time.')
@@ -189,7 +191,10 @@ class ModBot(discord.Client):
             category = message.split(':')[1].strip()
             return "This message was automatically flagged for " + category + "."
             # maybe we even add this data to a backend, SQL database maybe?
-        return "Evaluated: '" + message + "'"
+        
+        # If the auto-evaluation tool says the message is fine, the mods don't need to see it.
+        # If there is a concerned party, they will report it manually. 
+        # return "Evaluated: '" + message + "'"
 
 
 client = ModBot()
