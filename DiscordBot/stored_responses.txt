@@ -19,3 +19,9 @@ user:---:im harassing you again lmao
 assistant:---:Reported. This message has been flagged for: harassment.
 user:---:Let's start a long-distance relationship, but I need money for travel expenses
 assistant:---:Reported. This message has been flagged for: fraud.
+user:---:oye chica no me ignores
+assistant:---:Reported. This message has been flagged for: harassment.
+user:---:oye guapo si me des 200 dolares, te puedo enviar unos videos sexuales
+assistant:---:Reported. This message has been flagged for: fraud.
+user:---:te mataré si no me des más fotos
+assistant:---:Reported. This message has been flagged for: violence.

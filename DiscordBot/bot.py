@@ -26,7 +26,10 @@ logger.addHandler(handler)
 # There should be a file called 'tokens.json' inside the same folder as this file
 token_path = 'tokens.json'
 if not os.path.isfile(token_path):
-    raise Exception(f"{token_path} not found!")
+    if os.path.isfile('DiscordBot/' + token_path):
+        os.chdir('DiscordBot')
+    else:
+        raise Exception(f"{token_path} not found!")
 with open(token_path) as f:
     # If you get an error here, it means your token is formatted incorrectly. Did you put it in quotes?
     tokens = json.load(f)
@@ -163,8 +166,18 @@ class ModBot(discord.Client):
         mod_channel = self.mod_channels[message.guild.id]
         scores = self.eval_text(message.content)
         formatted_response = self.code_format(scores)
+        
         if(formatted_response):
-            # Send automatic flagged response
+            # strip category from end of response
+            category = formatted_response[43:]
+            # data cleansing
+            if "violence" in category:
+                category = "violence"
+            if "fraud" in category or "scam" in category:
+                category = "scam/fraud"
+            if "harassment" in category:
+                category = "harassment"
+                # Send automatic flagged response
             await mod_channel.send(f'Forwarded message:\n{message.author.name}: "{message.content}"')
             await mod_channel.send(self.code_format(scores))
 
@@ -187,8 +200,8 @@ class ModBot(discord.Client):
                     await mod_channel.send("Moderation Team has decided that the message did not violate any Community Guidelines.")
                 elif str(reaction.emoji) == '☹️':
                     await mod_channel.send("Moderation team has decided that the reported message did violate the Community Guidelines.")
-                    dataParser.addEntry(message.content, formatted_response)
-                    report_db.add_report(message.author.name, formatted_response)
+                    dataParser.addEntry(message.content, category)
+                    report_db.add_report(message.author.name, category)
 
             except asyncio.TimeoutError:
                 await mod_channel.send('You did not react in time.')
@@ -216,7 +229,6 @@ class ModBot(discord.Client):
             category = message.split(':')[1].strip('')
             translated_category = GoogleTranslator(source='auto', target='english').translate(category)
             return "This message was automatically flagged for " + translated_category
-            # maybe we even add this data to a backend, SQL database maybe?
         
         # If the auto-evaluation tool says the message is fine, the mods don't need to see it.
         # If there is a concerned party, they will report it manually. 
