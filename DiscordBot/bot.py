@@ -12,6 +12,7 @@ import asyncio
 import openai
 from openAIBot import openAIClassifier
 from parseDatabase import DataParser
+from deep_translator import GoogleTranslator
 
 # Set up logging to the console
 logger = logging.getLogger('discord')
@@ -122,24 +123,24 @@ class ModBot(discord.Client):
                         await channel.send(report_details)
 
                         moderator_action = "Moderators please choose from the following categories to determine the result of this report.\n"
-                        moderator_action += "1️⃣: Reported message does not violate Community Guidelines for the specified category.\n"
-                        moderator_action += "2️⃣: Reported message does violate Community Guidelines for the specified category."
+                        moderator_action += "🙂: Reported message does not violate Community Guidelines for the specified category.\n"
+                        moderator_action += "☹️: Reported message does violate Community Guidelines for the specified category."
                         response_message = await channel.send(moderator_action)
 
-                        await response_message.add_reaction('1️⃣')
-                        await response_message.add_reaction('2️⃣')
+                        await response_message.add_reaction('🙂')
+                        await response_message.add_reaction('☹️')
 
                         # Define a check function for the reaction
                         def check(reaction, user):
-                            return str(reaction.emoji) in ['1️⃣', '2️⃣']
+                            return str(reaction.emoji) in ['🙂', '☹️']
                         
                         try:
                             # Wait for a reaction
                             reaction, _ = await client.wait_for("reaction_add", timeout=1000000, check=check)
-                            if str(reaction.emoji) == '1️⃣':
+                            if str(reaction.emoji) == '🙂':
                                 await channel.send("Moderation Team informs the reporter that the reported message did not violate any Community Guidelines.")
                                 await message.channel.send("After looking through the report, the moderation team has decided that the reported message did not violate any Community Guidelines.")
-                            elif str(reaction.emoji) == '2️⃣':
+                            elif str(reaction.emoji) == '☹️':
                                 await channel.send("Moderation Team removes the reported message.")
                                 await message.channel.send("After looking through the report, the moderation team has decided that the reported message did violate the Community Guidelines.")
                                 dataParser.addEntry(report_info.report_content, report_info.report_category)
@@ -164,23 +165,23 @@ class ModBot(discord.Client):
             await mod_channel.send(self.code_format(scores))
 
             moderator_action = "Moderators please choose from the following categories to determine the result of this report.\n"
-            moderator_action += "1️⃣: Reported message does not violate Community Guidelines for the specified category.\n"
-            moderator_action += "2️⃣: Reported message does violate Community Guidelines for the specified category."
+            moderator_action += "🙂: Reported message does not violate Community Guidelines for the specified category.\n"
+            moderator_action += "☹️: Reported message does violate Community Guidelines for the specified category."
             response_message = await mod_channel.send(moderator_action)
 
-            await response_message.add_reaction('1️⃣')
-            await response_message.add_reaction('2️⃣')
+            await response_message.add_reaction('🙂')
+            await response_message.add_reaction('☹️')
 
             # Define a check function for the reaction
             def check(reaction, user):
-                return str(reaction.emoji) in ['1️⃣', '2️⃣']
+                return str(reaction.emoji) in ['🙂', '☹️']
             
             try:
                 # Wait for a reaction
                 reaction, _ = await client.wait_for("reaction_add", timeout=1000000, check=check)
-                if str(reaction.emoji) == '1️⃣':
+                if str(reaction.emoji) == '🙂':
                     await mod_channel.send("Moderation Team has decided that the message did not violate any Community Guidelines.")
-                elif str(reaction.emoji) == '2️⃣':
+                elif str(reaction.emoji) == '☹️':
                     await mod_channel.send("Moderation team has decided that the reported message did violate the Community Guidelines.")
                     # dataParser.addEntry(report_info.report_content, report_info.report_category)
 
@@ -213,8 +214,9 @@ class ModBot(discord.Client):
 
         message, response = text
         if response == 1:
-            category = message.split(':')[1].strip()
-            return "This message was automatically flagged for " + category
+            category = message.split(':')[1].strip('')
+            translated_category = GoogleTranslator(source='auto', target='english').translate(category)
+            return "This message was automatically flagged for " + translated_category
             # maybe we even add this data to a backend, SQL database maybe?
         
         # If the auto-evaluation tool says the message is fine, the mods don't need to see it.
