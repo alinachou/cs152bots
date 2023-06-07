@@ -17,3 +17,5 @@ user:---:i'll literally shoot you like this isnt something to play about; i know
 assistant:---:Reported. This message has been flagged for: violence.
 user:---:im harassing you again lmao
 assistant:---:Reported. This message has been flagged for: harassment.
+user:---:Let's start a long-distance relationship, but I need money for travel expenses
+assistant:---:Reported. This message has been flagged for: fraud.

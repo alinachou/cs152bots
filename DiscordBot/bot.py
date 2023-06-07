@@ -10,9 +10,11 @@ from report import Report
 import pdb
 import asyncio
 import openai
+from deep_translator import GoogleTranslator
+
 from openAIBot import openAIClassifier
 from parseDatabase import DataParser
-from deep_translator import GoogleTranslator
+from reportDatabase import ReportDatabase
 
 # Set up logging to the console
 logger = logging.getLogger('discord')
@@ -34,6 +36,7 @@ with open(token_path) as f:
     perspective_token = tokens['perspective']
 gpt_classifier = openAIClassifier(openai_token, openai_org)
 dataParser = DataParser("stored_responses.txt")
+report_db = ReportDatabase('report_database.db')
 
 class ModBot(discord.Client):
     def __init__(self): 
@@ -143,7 +146,8 @@ class ModBot(discord.Client):
                             elif str(reaction.emoji) == '☹️':
                                 await channel.send("Moderation Team removes the reported message.")
                                 await message.channel.send("After looking through the report, the moderation team has decided that the reported message did violate the Community Guidelines.")
-                                dataParser.addEntry(report_info.report_content, report_info.report_category)
+                                dataParser.addEntry(report_info.report_content, report_info.report_category)    # Add entry for data parser to include current report case
+                                report_db.add_report(message.author.name, report_info.report_category)
 
                         except asyncio.TimeoutError:
                             await channel.send('You did not react in time.')
@@ -183,7 +187,8 @@ class ModBot(discord.Client):
                     await mod_channel.send("Moderation Team has decided that the message did not violate any Community Guidelines.")
                 elif str(reaction.emoji) == '☹️':
                     await mod_channel.send("Moderation team has decided that the reported message did violate the Community Guidelines.")
-                    # dataParser.addEntry(report_info.report_content, report_info.report_category)
+                    dataParser.addEntry(message.content, formatted_response)
+                    report_db.add_report(message.author.name, formatted_response)
 
             except asyncio.TimeoutError:
                 await mod_channel.send('You did not react in time.')
@@ -206,12 +211,6 @@ class ModBot(discord.Client):
 
     
     def code_format(self, text):
-        ''''
-        TODO: Once you know how you want to show that a message has been 
-        evaluated, insert your code here for formatting the string to be 
-        shown in the mod channel. 
-        '''
-
         message, response = text
         if response == 1:
             category = message.split(':')[1].strip('')
