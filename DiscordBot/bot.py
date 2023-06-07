@@ -154,25 +154,48 @@ class ModBot(discord.Client):
         # Only handle messages sent in the "group-#" channel
         if not message.channel.name == f'group-{self.group_num}':
             return
-
         # Forward the message to the mod channel
         mod_channel = self.mod_channels[message.guild.id]
         scores = self.eval_text(message.content)
         formatted_response = self.code_format(scores)
         if(formatted_response):
+            # Send automatic flagged response
             await mod_channel.send(f'Forwarded message:\n{message.author.name}: "{message.content}"')
             await mod_channel.send(self.code_format(scores))
 
+            moderator_action = "Moderators please choose from the following categories to determine the result of this report.\n"
+            moderator_action += "1️⃣: Reported message does not violate Community Guidelines for the specified category.\n"
+            moderator_action += "2️⃣: Reported message does violate Community Guidelines for the specified category."
+            response_message = await mod_channel.send(moderator_action)
+
+            await response_message.add_reaction('1️⃣')
+            await response_message.add_reaction('2️⃣')
+
+            # Define a check function for the reaction
+            def check(reaction, user):
+                return str(reaction.emoji) in ['1️⃣', '2️⃣']
+            
+            try:
+                # Wait for a reaction
+                reaction, _ = await client.wait_for("reaction_add", timeout=1000000, check=check)
+                if str(reaction.emoji) == '1️⃣':
+                    await mod_channel.send("Moderation Team has decided that the message did not violate any Community Guidelines.")
+                elif str(reaction.emoji) == '2️⃣':
+                    await mod_channel.send("Moderation team has decided that the reported message did violate the Community Guidelines.")
+                    # dataParser.addEntry(report_info.report_content, report_info.report_category)
+
+            except asyncio.TimeoutError:
+                await mod_channel.send('You did not react in time.')
+
     
     def eval_text(self, message):
-        ''''
-        TODO: Once you know how you want to evaluate messages in your channel, 
-        insert your code here! This will primarily be used in Milestone 3. 
-        '''
-        # api calls here:
-
         response = 0 # add in what we want to differentiate to this varaible
         gpt_response = gpt_classifier.check_message(message)
+        # gpt_score = gpt_classifier.evaluate_categories(message)
+        
+        # print("response: ", gpt_response)
+        # print("score: ", gpt_score)
+        
         if "Ignored" in gpt_response:
             tup = (gpt_response, response)
         else:
