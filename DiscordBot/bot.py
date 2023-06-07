@@ -157,9 +157,11 @@ class ModBot(discord.Client):
 
         # Forward the message to the mod channel
         mod_channel = self.mod_channels[message.guild.id]
-        await mod_channel.send(f'Forwarded message:\n{message.author.name}: "{message.content}"')
         scores = self.eval_text(message.content)
-        await mod_channel.send(self.code_format(scores))
+        formatted_response = self.code_format(scores)
+        if(formatted_response):
+            await mod_channel.send(f'Forwarded message:\n{message.author.name}: "{message.content}"')
+            await mod_channel.send(self.code_format(scores))
 
     
     def eval_text(self, message):
@@ -189,7 +191,7 @@ class ModBot(discord.Client):
         message, response = text
         if response == 1:
             category = message.split(':')[1].strip()
-            return "This message was automatically flagged for " + category + "."
+            return "This message was automatically flagged for " + category
             # maybe we even add this data to a backend, SQL database maybe?
         
         # If the auto-evaluation tool says the message is fine, the mods don't need to see it.

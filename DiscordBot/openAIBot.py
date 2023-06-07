@@ -12,9 +12,10 @@ class openAIClassifier:
 
     def check_message(self, message):
         all_messages = self.dataParser.createArray()
+        all_messages.append({"role": "user", "content": message})
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=all_messages.append({"role": "user", "content": message})
+            messages=all_messages
         )
 
         output = response['choices'][0]['message']['content']
